@@ -1,0 +1,156 @@
+Option Explicit
+
+' Declaracion de variables globales '
+Global limite As Integer
+Global i As Integer
+'Macro principal desde la cual se llama al resto'
+Sub macroPrincipal()
+Call rellenaMarket
+Call brandCol
+Call priceCol
+Call formatoFecha
+Call formatoHeI
+End Sub
+
+'Encuentra una casilla llena y a la variable valor le da ese valor, y despues'
+' si la casilla esta vacia mete el valor que tiene la variable valor'
+
+Sub rellenaMarket()
+
+Dim valor As String
+
+Range("E2").End(xlDown).Select
+limite = ActiveCell.Row
+
+For i = 2 To limite
+    If IsEmpty(Cells(i, 1)) = False Then
+        valor = Cells(i, 1).Value
+    Else
+        Cells(i, 1).Value = valor
+    End If
+Next i
+
+End Sub
+
+Sub brandCol()
+
+Dim cadena As String
+Dim arraycad() As String
+Dim j As Integer
+Dim palabra As String
+Dim palabraBuena As String
+
+'Copia una columna y la pega en H'
+Range("G:G").Copy
+Range("H:H").PasteSpecial xlPasteAll
+Application.CutCopyMode = False
+
+'Cambia el nombre de la cabecera de la columna'
+Cells(1, 8).Value = "Brand"
+
+Range("E2").End(xlDown).Select
+limite = ActiveCell.Row
+
+'Split introduce en un array cada una de las cadenas, usando como token el espacio'
+For i = 2 To limite
+    cadena = Cells(i, 2).Value
+    arraycad() = Split(cadena)
+    
+    'por tanto la primera posicion del array contiene la palabra antes del primer espacio'
+    palabra = arraycad(0)
+    
+    'Nos quedamos con la primera mayuscula'
+    palabraBuena = Mid(palabra, 1, 1)
+    
+    'Recorremos el resto de la palabra, eliminando + y mayusculas de esta'
+    For j = 2 To Len(palabra)
+        If ((Asc(Mid(palabra, j, 1)) >= 65)) And ((Asc(Mid(palabra, j, 1)) < 90)) Or ((Asc(Mid(palabra, j, 1)) = 43)) Then
+            palabraBuena = palabraBuena
+        Else
+            palabraBuena = palabraBuena + Mid(palabra, j, 1)
+              
+        End If
+    Next j
+    
+    Cells(i, 8).Value = palabraBuena
+
+Next i
+
+End Sub
+
+
+Sub priceCol()
+
+Dim cadena As String
+Dim valor As Double
+
+'Copia de nuevo una columna y la pega en I"
+Range("E:E").Copy
+Range("I:I").PasteSpecial xlPasteAll
+Application.CutCopyMode = False
+
+'Cambio la cabecera de la nueva columna'
+Cells(1, 9).Value = "Price Round"
+
+'Ajusta el ancho de la celda'
+Cells(1, 9).ColumnWidth = 15
+
+Range("E2").End(xlDown).Select
+limite = ActiveCell.Row
+
+For i = 2 To limite
+
+    'Redondeamos a 0 decimales'
+    valor = Round(Cells(i, 5).Value, 0)
+    Cells(i, 9).Value = valor
+    
+    'Depende el valor del redondeo pintamos el fondo de verde o rojo'
+    If valor > 20 Then
+        Cells(i, 9).Interior.ColorIndex = 3
+    Else
+        Cells(i, 9).Interior.ColorIndex = 4
+    End If
+    
+Next i
+End Sub
+
+Sub formatoFecha()
+
+'Modificamos la fecha al formato solicitado'
+
+Range("G2:G2551").NumberFormat = "dd/mm/yy"
+
+End Sub
+
+Sub formatoHeI()
+    ' Para la H e I el borde inferior grueso y negro '
+    With Range("H2:H2551,I2:I2551").Borders(xlEdgeBottom)
+    .Weight = xlThick
+    .Color = RGB(0, 0, 0)
+    End With
+    
+    ' Para la H e I el 4 borde superior grueso y negro '
+    With Range("H2:H2551,I2:I2551").Borders(xlEdgeTop)
+    .Weight = xlThick
+    .Color = RGB(0, 0, 0)
+    End With
+    
+    ' Para la H e I el 4 borde izquierdo grueso y negro '
+    With Range("H2:H2551,I2:I2551").Borders(xlEdgeLeft)
+    .Weight = xlThick
+    .Color = RGB(0, 0, 0)
+    End With
+    
+    ' Para la I el 4 borde derecho grueso y negro, para H no es necesario '
+    ' puesto que se cubre con el lado izquierdo de I '
+    With Range("I2:I2551").Borders(xlEdgeRight)
+    .Weight = xlThick
+    .Color = RGB(0, 0, 0)
+    End With
+    
+    ' Pinta el borde abajo entre celdas '
+    With Range("H2:H2551,I2:I2551").Borders(xlInsideHorizontal)
+    .Weight = xlThick
+    .Color = RGB(0, 0, 0)
+    End With
+End Sub

@@ -1,0 +1,4 @@
+elimino columnas ia14, source_name, source, comments
+sustituyo NA por 0 y cambio de tipo texto a tipo numero entero
+del otro como es el mismo que en excel, elimino indice y ya
+dejo la de ARN diferencia y todas esas
